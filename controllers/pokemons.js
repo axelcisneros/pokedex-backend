@@ -98,7 +98,8 @@ const getPokemonTypes = async (req, res) => {
       res.status(response.status).json({ message: 'Error al obtener los tipos de Pokémon' });
     } else {
       const data = await response.json();
-      res.json(data);
+      // Solo envía el array de tipos bajo la clave 'types'
+      res.json({ types: data.results });
     }
   } catch (err) {
     res.status(500).json({ message: 'Error al obtener los tipos de Pokémon' });
