@@ -40,6 +40,15 @@ app.use((req, res, next) => {
   next();
 });
 
+// Ruta raíz para mensaje de bienvenida o estado
+app.get('/', (req, res) => {
+  res.json({
+    message: 'API Pokedex backend funcionando',
+    status: 'ok',
+    date: new Date().toISOString(),
+  });
+});
+
 // Conexión a la base de datos
 mongoose.connect(MONGO_URI)
   .then(() => {
