@@ -95,15 +95,12 @@ const getPokemonTypes = async (req, res) => {
   try {
     const response = await fetch('https://pokeapi.co/api/v2/type');
     if (!response.ok) {
-      // Siempre responde con la clave 'types', aunque esté vacío
       res.status(response.status).json({ types: [], message: 'Error al obtener los tipos de Pokémon' });
     } else {
       const data = await response.json();
-      // Solo envía el array de tipos bajo la clave 'types'
       res.json({ types: data.results });
     }
   } catch (err) {
-    // Siempre responde con la clave 'types', aunque esté vacío
     res.status(500).json({ types: [], message: 'Error al obtener los tipos de Pokémon' });
   }
 };
