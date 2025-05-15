@@ -58,7 +58,26 @@ const getExternalPokemonList = async (req, res) => {
   try {
     const response = await fetch(`https://pokeapi.co/api/v2/pokemon?offset=${offset}&limit=${limit}`);
     const data = await response.json();
-    res.json(data);
+    // Enriquecer cada pokémon con el sprite oficial (igual que en detalles)
+    const enrichedResults = await Promise.all(
+      data.results.map(async (pokemon) => {
+        // Obtener el id del url
+        const id = pokemon.url.split('/')[6];
+        // Obtener detalles para el sprite oficial
+        try {
+          const pokeDetails = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
+          const pokeData = await pokeDetails.json();
+          return {
+            ...pokemon,
+            id,
+            sprite: pokeData.sprites?.other?.['official-artwork']?.front_default || pokeData.sprites?.front_default || '',
+          };
+        } catch {
+          return { ...pokemon, id, sprite: '' };
+        }
+      }),
+    ); // <- Agrega la coma faltante aquí
+    res.json({ ...data, results: enrichedResults });
   } catch (err) {
     res.status(500).json({ message: 'Error al obtener la lista de Pokémon' });
   }
@@ -120,11 +139,35 @@ const getPokemonsByTypes = async (req, res) => {
         throw new Error(`Error al obtener el tipo: ${type}`);
       }
       const data = await response.json();
-      return data.pokemon.map((p) => p.pokemon);
+      // data.pokemon.map((p) => p.pokemon) solo trae name y url, hay que enriquecer con id y sprite
+      return data.pokemon.map((p) => {
+        const poke = p.pokemon;
+        const id = poke.url.split('/')[6];
+        return {
+          ...poke,
+          id,
+        };
+      });
     });
     const results = await Promise.all(promises);
     const merged = [].concat(...results);
-    const unique = Array.from(new Map(merged.map((p) => [p.name, p])).values());
+    // Enriquecer cada pokémon con el sprite oficial
+    const enriched = await Promise.all(
+      merged.map(async (poke) => {
+        try {
+          const pokeDetails = await fetch(`https://pokeapi.co/api/v2/pokemon/${poke.id}`);
+          const pokeData = await pokeDetails.json();
+          return {
+            ...poke,
+            sprite: pokeData.sprites?.other?.['official-artwork']?.front_default || pokeData.sprites?.front_default || '',
+          };
+        } catch {
+          return { ...poke, sprite: '' };
+        }
+      }),
+    );
+    // Eliminar duplicados por nombre
+    const unique = Array.from(new Map(enriched.map((p) => [p.name, p])).values());
     res.json({ pokemons: unique });
   } catch (err) {
     res.status(500).json({ message: 'Error al filtrar Pokémon por tipos', error: err.message });
