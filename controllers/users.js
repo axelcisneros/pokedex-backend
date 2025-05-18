@@ -26,14 +26,29 @@ const loginUser = async (req, res) => {
     }
     const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret', { expiresIn: '7d' });
     res.send({ token });
-    return null; // Asegurar retorno
   } catch (err) {
     res.status(500).send({ message: 'Error al iniciar sesión' });
     return null; // Asegurar retorno
   }
+  return null; // Retorno por defecto para evitar warning
+};
+
+// Obtener usuario actual
+const getCurrentUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).select('-password');
+    if (!user) {
+      return res.status(404).send({ message: 'Usuario no encontrado' });
+    }
+    res.send({ email: user.email, name: user.name });
+  } catch (err) {
+    res.status(500).send({ message: 'Error al obtener el usuario' });
+  }
+  return null; // Retorno por defecto para evitar warning
 };
 
 module.exports = {
   createUser,
   loginUser,
+  getCurrentUser,
 };
