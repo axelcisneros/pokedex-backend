@@ -15,7 +15,15 @@ const { PORT = 3000, MONGO_URI } = process.env;
 const app = express();
 
 // Middlewares
-app.use(cors());
+const corsOptions = {
+  origin: [
+    'https://pokedex-iosn.onrender.com',
+    'http://localhost:3000',
+    'http://localhost:5173',
+  ],
+  credentials: true, // Permite el envío de cookies/autenticación si es necesario
+};
+app.use(cors(corsOptions));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
