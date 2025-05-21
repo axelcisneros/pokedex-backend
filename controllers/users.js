@@ -12,8 +12,9 @@ const createUser = async (req, res) => {
     const user = await User.create({ email, password: hashedPassword, name });
     res.status(201).send({ email: user.email, name: user.name });
   } catch (err) {
-    res.status(400).send({ message: 'Error al crear el usuario' });
+    return res.status(400).send({ message: 'Error al crear el usuario' });
   }
+  return null;
 };
 
 // Iniciar sesión
@@ -27,10 +28,9 @@ const loginUser = async (req, res) => {
     const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret', { expiresIn: '7d' });
     res.send({ token });
   } catch (err) {
-    res.status(500).send({ message: 'Error al iniciar sesión' });
-    return null; // Asegurar retorno
+    return res.status(500).send({ message: 'Error al iniciar sesión' });
   }
-  return null; // Retorno por defecto para evitar warning
+  return null;
 };
 
 // Obtener usuario actual
@@ -42,9 +42,9 @@ const getCurrentUser = async (req, res) => {
     }
     res.send({ email: user.email, name: user.name });
   } catch (err) {
-    res.status(500).send({ message: 'Error al obtener el usuario' });
+    return res.status(500).send({ message: 'Error al obtener el usuario' });
   }
-  return null; // Retorno por defecto para evitar warning
+  return null;
 };
 
 module.exports = {

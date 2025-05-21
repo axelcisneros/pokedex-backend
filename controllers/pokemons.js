@@ -33,22 +33,19 @@ const createPokemon = async (req, res) => {
 const deletePokemon = async (req, res) => {
   try {
     const { pokemonId } = req.params;
-
-    const pokemon = await Pokemon.findById(pokemonId).select('+owner'); // Forzar la inclusión del campo `owner`
+    const pokemon = await Pokemon.findById(pokemonId).select('+owner');
     if (!pokemon) {
-      return res.status(404).send({ message: 'Pokémon no encontrado' });
+      res.status(404).send({ message: 'Pokémon no encontrado' });
+      return;
     }
-
     if (pokemon.owner.toString() !== req.user._id) {
-      return res.status(403).send({ message: 'No tienes permiso para eliminar este Pokémon' });
+      res.status(403).send({ message: 'No tienes permiso para eliminar este Pokémon' });
+      return;
     }
-
-    await Pokemon.findByIdAndDelete(pokemonId); // Eliminar directamente usando findByIdAndDelete
+    await Pokemon.findByIdAndDelete(pokemonId);
     res.send({ message: 'Pokémon eliminado' });
-    return null; // Asegurar retorno
   } catch (err) {
     res.status(500).send({ message: 'Error al eliminar el Pokémon' });
-    return null; // Asegurar retorno
   }
 };
 
@@ -115,10 +112,10 @@ const getPokemonTypes = async (req, res) => {
     const response = await fetch('https://pokeapi.co/api/v2/type');
     if (!response.ok) {
       res.status(response.status).json({ types: [], message: 'Error al obtener los tipos de Pokémon' });
-    } else {
-      const data = await response.json();
-      res.json({ types: data.results });
+      return;
     }
+    const data = await response.json();
+    res.json({ types: data.results });
   } catch (err) {
     res.status(500).json({ types: [], message: 'Error al obtener los tipos de Pokémon' });
   }
@@ -139,7 +136,6 @@ const getPokemonsByTypes = async (req, res) => {
         throw new Error(`Error al obtener el tipo: ${type}`);
       }
       const data = await response.json();
-      // data.pokemon.map((p) => p.pokemon) solo trae name y url, hay que enriquecer con id y sprite
       return data.pokemon.map((p) => {
         const poke = p.pokemon;
         const id = poke.url.split('/')[6];
@@ -151,7 +147,6 @@ const getPokemonsByTypes = async (req, res) => {
     });
     const results = await Promise.all(promises);
     const merged = [].concat(...results);
-    // Enriquecer cada pokémon con el sprite oficial
     const enriched = await Promise.all(
       merged.map(async (poke) => {
         try {
@@ -166,7 +161,6 @@ const getPokemonsByTypes = async (req, res) => {
         }
       }),
     );
-    // Eliminar duplicados por nombre
     const unique = Array.from(new Map(enriched.map((p) => [p.name, p])).values());
     res.json({ pokemons: unique });
   } catch (err) {
