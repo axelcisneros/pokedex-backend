@@ -1,0 +1,55 @@
+{
+  "name": "pokedex-backend",
+  "version": "1.0.0",
+  "description": "Pokedex",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "lint": "npx eslint ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/axelcisneros/pokedex-backend.git"
+  },
+  "keywords": [],
+  "author": "Axel Cisneros",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/axelcisneros/pokedex-backend/issues"
+  },
+  "homepage": "https://github.com/axelcisneros/pokedex-backend#readme",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.56.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.31.0",
+    "nodemon": "^3.1.10"
+  },
+  "dependencies": {
+    "@eslint/config-array": "^0.20.0",
+    "@eslint/object-schema": "^2.1.6",
+    "bcryptjs": "^3.0.2",
+    "body-parser": "^2.2.0",
+    "celebrate": "^15.0.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "express-winston": "^4.2.0",
+    "glob": "^11.0.2",
+    "joi": "^17.13.3",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.14.2",
+    "node-fetch": "^2.7.0",
+    "rimraf": "^6.0.1",
+    "validator": "^13.15.0",
+    "winston": "^3.17.0"
+  },
+  "overrides": {
+    "rimraf": "^6.0.1",
+    "glob": "^11.0.2"
+  }
+}
